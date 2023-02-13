@@ -1,5 +1,5 @@
 # gulp-documentation
-Documentação de utilização da biblioteca gulp JS para automação de arquivos de front-end.
+Documentação de utilização da biblioteca gulp JS para automação de arquivos de front-end. Nessa documentação é ultilzado um projeto em Laravel para a estrutura dos arquivos, mas a lógica é a mesma para qualquer sistema.
 
 ### GulpJS (com versionamento de arquivos)
 > **1.** Primeiramente é necessário instalar o gulp e suas dependências:
@@ -288,7 +288,34 @@ exports.watch = gulp.series(['watch']);
 
 **`exports.watch`** define uma tarefa que permite acompanhar as alterações nos arquivos CSS e JavaScript em tempo real e executar as tarefas adequadas a cada alteração (**`css:debug`** ou **`scripts:debug`**).
 
-> **8.** No console da aplicação: rode o comando gulp para executar o script ou gulp watch para deixar o build vigiando as alterações nos arquivos.
+> **8.** No console da aplicação: rode o comando **`gulp`** para executar o script ou **`gulp watch`** para deixar o build vigiando as alterações nos arquivos.
+
+Os arquivos serão compilados com a versão definida no package.json. Dessa forma é necessário fazer a chamada certa no HTML para usar a última versão compilada. Já que estamos utilizando Laravel, crie um arquivo de configuração na pasta **config**. Chamaremos de **aliases.php** mas você pode dar o nome que preferir.
+
+Dentro do arquivo você irá definir alguns apelidos para serem usados como variáveis globais dentro do seu projeto. Insira o seguinte código:
+
+```php
+<?php
+$pckJson = file_get_contents(base_path('package.json'));
+$pckConfigs = json_decode($pckJson, true);
+
+return [
+'scripts_ver' => $pckConfigs['suaConfig']['scriptsVer'],
+'styles_ver' => $pckConfigs['suaConfig']['stylesVer'],
+'bundle_ver' => $pckConfigs['suaConfig']['bundleVer'],
+];
+```
+Aqui você está pegando a versão dos seus scripts e estilos definidos no **package.json**.
+
+Agora na VIEW, em seu HTML onde chama o css, defina o seguinte:
+```html
+@php
+    $src = 'assets/css/all-'.config("aliases.styles_ver").'.min.css';
+@endphp
+<link rel="stylesheet" type="text/css" media="all" href="{{ asset($src) }}" />
+```
+
+Pronto! Você estará usando a última versão de seus estilos e scripts.
 
 
 
